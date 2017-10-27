@@ -135,6 +135,34 @@ interface RouteInterface
     public function setDescription(string $description): RouteInterface;
 
     /**
+     * Get tags.
+     *
+     * @param string|null $name
+     *
+     * @return array
+     */
+    public function getTags(?string $name = null): array;
+
+    /**
+     * Set tags.
+     *
+     * @param string[] $tags
+     *
+     * @return \Berlioz\Core\Services\Routing\RouteInterface
+     */
+    public function setTags(array $tags): RouteInterface;
+
+    /**
+     * Has tag ?
+     *
+     * @param string      $name
+     * @param string|null $value
+     *
+     * @return bool
+     */
+    public function hasTag(string $name, ?string $value = null): bool;
+
+    /**
      * No authentication requirement ?
      *
      * @return bool

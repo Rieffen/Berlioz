@@ -33,6 +33,13 @@ interface RouteSetInterface extends \Countable
     public function addRoute(RouteInterface $route): RouteSetInterface;
 
     /**
+     * Get routes.
+     *
+     * @return \Berlioz\Core\Services\Routing\RouteInterface[]
+     */
+    public function getRoutes(): array;
+
+    /**
      * Get routes by name.
      *
      * @param string $name Name of route

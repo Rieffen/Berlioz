@@ -51,6 +51,14 @@ class RouteSet implements RouteSetInterface
     /**
      * @inheritdoc
      */
+    public function getRoutes(): array
+    {
+        return $this->routes;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getByName($name): array
     {
         $routes = [];

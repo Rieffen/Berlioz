@@ -32,6 +32,8 @@ class Route implements RouteInterface
     private $summary;
     /** @var string Description */
     private $description;
+    /** @var array Tags */
+    private $tags;
     /** @var mixed[] Parameters values */
     private $parameters_values;
 
@@ -66,12 +68,21 @@ class Route implements RouteInterface
                         $docBlock = Router::getDocBlockFactory()->create($methodDoc);
 
                         if ($docBlock->hasTag('route')) {
+                            // Tags
+                            $tags = [];
+                            /** @var \phpDocumentor\Reflection\DocBlock\Tag $tag */
+                            foreach ($docBlock->getTags() as $tag) {
+                                $tags[] = ['name'  => $tag->getName(),
+                                           'value' => (string) $tag];
+                            }
+
                             /** @var \phpDocumentor\Reflection\DocBlock\Tags\Generic $tag */
                             foreach ($docBlock->getTagsByName('route') as $tag) {
                                 $route = new Route;
-                                $route->setRouteDeclaration($tag->getDescription()->render(), $basePath);
+                                $route->setRouteDeclaration((string) $tag->getDescription(), $basePath);
                                 $route->setSummary($docBlock->getSummary());
-                                $route->setDescription($docBlock->getDescription()->render());
+                                $route->setDescription((string) $docBlock->getDescription());
+                                $route->setTags($tags);
                                 $route->setInvoke($reflectionMethod->class, $reflectionMethod->getName());
                                 $route->getRouteRegex();
 
@@ -398,6 +409,59 @@ EOD;
         $this->description = $description;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTags(?string $name = null): array
+    {
+        if (!is_null($name)) {
+            return $this->tags ?? [];
+        } else {
+            $result = [];
+
+            foreach ($this->tags as $tag) {
+                if ($tag['name'] == $name) {
+                    $result[] = $tag;
+                }
+            }
+
+            return $result;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setTags(array $tags): RouteInterface
+    {
+        foreach ($tags as $tag) {
+            if (isset($tag['name'])) {
+                $this->tags[] = ['name'  => $tag['name'],
+                                 'value' => $tag['value'] ?? null];
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasTag(string $name, ?string $value = null): bool
+    {
+        $tags = $this->getTags($name);
+
+        if (!is_null($value)) {
+            foreach ($tags as $tag) {
+                if ($tag['value'] == $value) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
